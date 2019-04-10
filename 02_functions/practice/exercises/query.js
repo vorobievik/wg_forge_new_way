@@ -84,7 +84,7 @@
 export default function query(tableName) {
   let result = '';
   let name = tableName;
-  let array = null;
+  let array = null
 
   const select = function (...arg) {
     array = arg.concat()
@@ -103,12 +103,16 @@ export default function query(tableName) {
 
   const from = function (nameTable) {
     if (name == undefined) {
-      if (array.length == 0) {
+      if (result.includes('FROM')) {
+        return this
+      }
+      else { if (array.length == 0) {
         result = `SELECT * FROM ${nameTable}`
       } else {
         result = `SELECT ${array} FROM ${nameTable}`
       }
-      return this
+      return this}
+     
     } else {
       return this
     }
@@ -116,61 +120,298 @@ export default function query(tableName) {
   }
 
   const where = function (fieldName) {
-  result = result + " WHERE "
+    if (result.includes('WHERE')) {
+      result = `${result} AND ${fieldName} `;
+    }
+ else{result = `${result} WHERE ${fieldName} `};
     const equals = function (value) {
-      result = result + `${fieldName} = ${value}`
-      return this
+      if (typeof value == 'string') {
+        result = result+ '= \'' + value + '\''; 
+          if (result.includes('NOT')) {
+           result = result.replace("NOT",'')
+              let a = result.indexOf('WHERE')
+              let b = result.indexOf(fieldName)
+              result = `${result.slice(0,(a-1)+fieldName.length)}NOT ${result.slice(b)}` 
+              if (result.includes(`= \'${value}`)) {
+                let index = result.indexOf(`= \'${value}`);
+                result = result.slice(0,index-1) + result.slice(index)
+              }
+          }
+      }
+      else if (result.includes('NOT')) {
+        result = result+ `= ${value}` ; 
+        result = result.replace(" NOT",'')
+           let a = result.indexOf('WHERE')
+           let b = result.indexOf(fieldName)
+           result = result.replace(b,'')
+           result = `${result.slice(0,(a+5))} NOT ${result.slice(b )}` 
+       }
+       else{ result = result+ `= ${value}`}
+      return {
+        select,
+        from,
+        where,
+        toString,
+        orWhere,
+      }
+      
     }
     const iN = function (array) {
-      let str = array.join(',');
-      result += ` , IN ${str}`
-      return this
+      for (let i = 0; i < array.length; i++) {
+        if (typeof array[i]== 'string') {
+          array[i]=  '\'' + array[i] + '\''
+        }
+        
+      }
+      let str = array.join(', ');
+      result = `${result}IN (${str})`
+      return {
+        select,
+        from,
+        where,
+        toString,
+        orWhere,
+      }
     }
     const gt = function (value) {
-      result ` >  ${value}`
-      return this
+      result += `>  ${value}`
+      return {
+        select,
+        from,
+        where,
+        toString,
+        orWhere,
+      }
     }
     const gte = function (value) {
-      result += ` >=  ${value}`
-      return this
+      if (typeof value == 'string') {
+        result = result+ '= \'' + value + '\''; 
+      result += `>=  ${value}`
+    }
+      return {
+        select,
+        from,
+        where,
+        toString,
+        orWhere,
+      }
     }
     const lt = function (value) {
       result += ` <  ${value}`
-      return this
+      return {
+        select,
+        from,
+        where,
+        toString,
+        orWhere,
+      }
     }
     const lte = function (value) {
-      result += ` <= ${value}`
-      return this
+      result += `<= ${value}`
+      return {
+        select,
+        from,
+        where,
+        toString,
+        orWhere,
+      }
     }
     const between = function (from, to) {
-      result += `  BETWEEN ${from} AND ${to}`
-      return this
+      result += `BETWEEN ${from} AND ${to}`
+      return {
+        select,
+        from,
+        where,
+        toString,
+        orWhere,
+      }
     }
     const isNull = function () {
-      result += `  NULL`
-      return this
+
+      result += `NULL`
+      if (result.includes('NOT')) {
+        result = result.replace("NOT",'')
+           let a = result.indexOf('WHERE')
+      
+           result = `${result.slice(0,(a+5))} ${fieldName} IS NOT NULL` 
+       }
+      return {
+        select,
+        from,
+        where,
+        toString,
+        orWhere,
+      }
     }
     const not = function () {
-      let text = `  NOT`
+      let text = `NOT `
       
       if (result.slice(-text.length)==text) {
-       throw new Error('пашел нахер пес') 
+       throw new Error("not() can't be called multiple times in a row") 
       }
-      else{result +=text}
+       else{
+        
+        
+        result += text }
       
-      return this
+       return {
+        equals,
+        in: iN,
+        between,
+        gt,
+        gte,
+        lt,
+        lte,
+        isNull,
+        not
+      }
     }
-    const toString = function () {
-      let b= ';'
-    return result+b
-    }
-    toString()
+  
+    
     return {
       equals,
       in: iN,
       between,
       gt,
-
+      gte,
+      lt,
+      lte,
+      isNull,
+      not
+    }
+  }
+  const orWhere = function (fieldName) {
+    if (result.includes('WHERE')) {
+      result = `${result} OR ${fieldName} `;
+    }
+ else{result = `${result} WHERE ${fieldName} `};
+    const equals = function (value) {
+      if (typeof value == 'string') {
+        result = result+ '= \'' + value + '\''; 
+          if (result.includes('NOT')) {
+           result = result.replace("NOT",'')
+              let a = result.indexOf('WHERE')
+              let b = result.indexOf('webname')
+              result = `${result.slice(0,a+5)} NOT ${result.slice(b )}` 
+          }
+      }
+      else{ result = result + `= ${value}`}
+      return {
+        select,
+        from,
+        where,
+        toString,
+        orWhere,
+      }
+      
+    }
+    const iN = function (array) {
+      let str = array.join(', ');
+      result = `${result} IN (${str})`
+      return {
+        select,
+        from,
+        where,
+        toString,
+        orWhere,
+      }
+    }
+    const gt = function (value) {
+      if (typeof value == 'string') {
+        result = result+ '> \'' + value + '\''; }
+        else{ result = result+ '> ' + value }
+   
+      return {
+        select,
+        from,
+        where,
+        toString,
+        orWhere,
+      }
+    }
+    const gte = function (value) {
+      if (typeof value == 'string') {
+        result = result+ '>= \'' + value + '\''; }
+      
+      return {
+        select,
+        from,
+        where,
+        toString,
+        orWhere,
+      }
+    }
+    const lt = function (value) {
+      if (typeof value == 'string') {
+        result = result+ '< \'' + value + '\''; }
+     
+      return {
+        select,
+        from,
+        where,
+        toString,
+        orWhere,
+      }
+    }
+    const lte = function (value) {
+      if (typeof value == 'string') {
+        result = result+ '<= \'' + value + '\''; }
+     
+      return {
+        select,
+        from,
+        where,
+        toString,
+        orWhere,
+      }
+    }
+    const between = function (from, to) {
+      result += `BETWEEN ${from} OR ${to}`
+      return {
+        select,
+        from,
+        where,
+        toString,
+        orWhere,
+      }
+    }
+    const isNull = function () {
+      result += `  NULL`
+      return {
+        select,
+        from,
+        where,
+        toString, 
+         orWhere,
+      }
+    }
+    const not = function () {
+      let text = `NOT`
+      
+      if (result.slice(-text.length)==text) {
+       throw new Error("not() can't be called multiple times in a row") 
+      }
+       else{ result += text }
+      
+       return {
+        equals,
+        in: iN,
+        between,
+        gt,
+        gte,
+        lt,
+        lte,
+        isNull,
+        not
+      }
+    }
+  
+    
+    return {
+      equals,
+      in: iN,
+      between,
+      gt,
       gte,
       lt,
       lte,
@@ -179,16 +420,13 @@ export default function query(tableName) {
     }
   }
   const toString = function () {
-  let b= ';'
-    return result
+    return result + ';'
   }
   return {
     select,
     from,
     where,
-    toString
-    
-  
+    toString,
+    orWhere
   }
 }
-
