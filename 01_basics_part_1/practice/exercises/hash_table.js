@@ -3,6 +3,14 @@
  * Необходимо реализовать хеш-таблицу, в которой в значения можно записывать данные любого типа.
  * Ключом должна быть строка.
  */
+function isStringFunction(value) {
+  const type = typeof value
+  if (type != 'string') {
+    return false
+
+  }
+  return true
+}
 
 export default class HashTable {
   /**
@@ -20,31 +28,31 @@ export default class HashTable {
    */
 
   hashKey(key) {
-    // your code is here
+  
+      return key.split("").reduce(function (a, b) { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
   }
-
   /**
    * Метод для получения данных из хеш-таблицы по ключу.
    */
-
   get(key) {
-    // your code here
+    return this.memory[this.hashKey(key)]
   }
-
   /**
    * Добавляем значение в таблицу с заданным ключом.
    */
-
   set(key, value) {
-    // your code is here
-  }
+if ((isStringFunction(key))) {
+  return this.memory[this.hashKey(key)] = value
 
+  }
+  return alert(`${key} 'is not a string'`)
+}
   /**
    * Функция удаления из хеш-таблицы.
    * Принимает ключ.
    */
 
   remove(key) {
-    // your code is here
+    return delete this.memory[this.hashKey(key)]
   }
 }

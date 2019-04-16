@@ -6,7 +6,12 @@ Example:
 [1, 2, 3], x => x + 1  yields [2, 3 ,4]
 */
 export function map(array, func) {
-  // YOUR CODE HERE
+  let arr=[]
+  for (let i = 0; i < array.length; i++) {
+   arr= [...arr,func(array[i])] 
+    
+  }
+return arr
 }
 
 /*
@@ -19,8 +24,15 @@ returns new array with elements matched to filter
 
 */
 export function filter(array, fn) {
-  // YOUR CODE HERE
-}
+  let arr = [];
+  for (let i = 0; i < array.length; i++) {
+    if (fn(array[i])) {
+      arr = [...arr,array[i] ]
+    }   
+  }
+  return arr
+  }
+
 
 /*
 Implement a function that returns a function which yields a fibonaccy number
@@ -35,8 +47,34 @@ gen() -> 3
 gen() -> 5
 ...
 */
-export function fibGenerator() {
-  // YOUR CODE HERE
+let range = {
+  from: 0,
+
+}
+range[Symbol.iterator] = function () {
+  let current = [this.from]
+  let res
+  return {
+    next() {
+      if (current.length ) { 
+      
+        res = current[current.length - 1];
+        current.push(current.length > 1 ? current[current.length - 1] + current[current.length - 2] : 1);
+        return {
+          done: false,
+          value: res
+        }
+      }
+    }
+
+  }
+}
+export function fibGenerator(){
+  let iter = range[Symbol.iterator]()
+  return function(){
+  
+    return iter.next().value
+  }
 }
 
 /*
@@ -53,5 +91,9 @@ sumTwoAndFour() // 6
 Note: function has a length property which shows how many arguments it receives
 */
 export function partial(fn, ...args) {
-  // YOUR CODE HERE
+  return function(...arr){
+   
+      return fn(...args,...arr)
+  }
+
 }

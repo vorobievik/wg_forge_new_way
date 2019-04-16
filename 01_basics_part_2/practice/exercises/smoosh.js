@@ -15,12 +15,41 @@
  * с сообщением 'argument should be an array'.
  */
 
-function smoosh() {
-  // your code here
+function smoosh(arr) {
+  if (Array.isArray(arr)) {
+    let array = [...arr];
+    let arr2 = [];
+    while (array.length) {
+      let elem = array.pop();
+      if (Array.isArray(elem)) {
+        array.push(...elem);
+      } else {
+        arr2.push(elem);
+      }
+    }
+    return arr2.reverse();
+  } else {
+    throw new Error('argument should be an array');
+  }
 }
 
-function squeeze() {
-  // your code here
+function squeeze(array) {
+  if (Array.isArray(array)) {
+    for (let i = 0; i < array.length; i++) {
+      if (Array.isArray(array[i])) {
+        array.push(...array[i]);
+      }
+    }
+    for (let i = 0; i < array.length; i++) {
+      if (Array.isArray(array[i])) {
+        array.splice(i, 1);
+      }
+    }
+  } else {
+    throw new Error('argument should be an array');
+  }
+  array.sort();
+  return array;
 }
 
 export { smoosh, squeeze };

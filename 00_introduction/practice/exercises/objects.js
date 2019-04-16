@@ -11,8 +11,21 @@ Example:
 }
 */
 export function collectByFirstLetter(...words) {
-  // YOUR CODE HERE
-}
+      let arr = [...words]
+      let obj = {}
+  let array = arr.map(w=> w[0])
+  let array2=  array.filter((a,index)=>array.indexOf(a)===index)
+  array2.forEach((element)=>{
+      obj[element]=arr.filter(word=> word[0]==element).sort()
+  })
+  console.log(obj)
+  return obj
+  }
+  
+
+
+  
+ 
 
 /*
 Write a function which receives object and list of keys
@@ -22,8 +35,21 @@ unknown keys are ignored
 Example:
 ({name: 'John', age: 42}, 'name') yields {name: 'John'}
 */
-export function only(obj, ...keys) {
-  // YOUR CODE HERE
+export  function only(obj, ...keys) {
+  let arr = [...keys]
+let result={}
+
+arr.forEach((element)=>{
+
+  for (const key in obj) {
+      if (key ==element) {
+         result[key]=obj[key]
+      }
+  }
+
+})
+
+return result
 }
 
 /*
@@ -44,8 +70,23 @@ Example:
 '' yields {}
 */
 export function wordsCount(text) {
-  // YOUR CODE HERE
-}
+   let obj = {};
+   let array
+   if (text) {
+     array = text.split(' ');
+     for (let i = 0; i < array.length; i++) {
+   
+      let num = array[i].toLowerCase().replace(/[.,\/#!?$%\^&\*;:{}=\-_`~()]/g, '')
+      obj[num]= obj[num] ? obj[num] + 1 :1
+         }
+          return obj 
+   }
+   else return obj
+   
+
+  
+      
+   }
 
 /*
 Write a function's body which create an object for user representation
@@ -62,5 +103,18 @@ user.isWeakPassword() === false
 */
 
 export function createUser(login, password) {
-  // YOUR CODE HERE
+  let obj = { 
+  login: login,
+  password:password,
+  isWeakPassword: ()=>{
+   
+
+     if (obj.password===obj.password.toLowerCase()) {
+         return true
+     }
+     else return false
+  }
+  };
+
+  return obj
 }
